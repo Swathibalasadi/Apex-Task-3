@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Responsive Interactive Web Project</title>
+  <style>
+    /* Base Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #929496;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .section {
+      margin: 40px 0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      body {
+        background-color: #00282d;
+      }
+    }
+
+    /* Quiz Styles */
+    #quiz-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      max-width: 600px;
+      margin: auto;
+    }
+    #quiz-container ul {
+      list-style: none;
+      padding: 0;
+    }
+    #quiz-container li {
+      background: #f9f9f9;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    #quiz-container li:hover {
+      background: #e0e0e0;
+    }
+
+    /* API Data Styles */
+    #api-data {
+      background: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      max-width: 600px;
+      margin: auto;
+      text-align: center;
+    }
+    #api-data p {
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+
+  <h1><i>Responsive Interactive Web Project</i></h1>
+
+  <!-- Responsive Design Section -->
+  <div class="section">
+    <h2>Responsive Design</h2>
+    <p><i>Resize the browser window to see background color change on smaller screens.</i></p>
+  </div>
+
+  <!-- Quiz Section -->
+  <div class="section" id="quiz-container">
+    <h2>Quiz</h2>
+    <p id="question">Question text</p>
+    <ul id="options">
+      <!-- Options will be populated here -->
+    </ul>
+    <button id="next">Next</button>
+    <p id="score"></p>
+  </div>
+
+  <!-- API Data Section -->
+  <div class="section" id="api-data">
+    <h2>Random Joke</h2>
+    <p id="joke">Loading joke...</p>
+    <button id="new-joke">Get Another Joke</button>
+  </div>
+
+  <script>
+    // Quiz Functionality
+    const quizData = [
+      {
+        question: "What is the hardest natural substance on Earth?",
+        options: ["Iron", "Diamond", "Gold", "Quartz"],
+        answer:  "Diamond"
+
+      },
+      {
+        question:"In which year did World War II end?",
+        options: ["1945", "1939", "1940", "1950"],
+        answer:  "1945"
+
+      },
+      {
+        question: "What gas do plants absorb from the atmosphere?",
+        options:  ["Oxygen", "Nitrogen", "Carbon Dioxide", "Helium"],
+        answer:"Carbon Dioxide"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const nextBtn = document.getElementById("next");
+    const scoreEl = document.getElementById("score");
+
+    function loadQuestion() {
+      const currentQuiz = quizData[currentQuestion];
+      questionEl.textContent = currentQuiz.question;
+      optionsEl.innerHTML = "";
+
+      currentQuiz.options.forEach(option => {
+        const li = document.createElement("li");
+        li.textContent = option;
+        li.addEventListener("click", () => {
+          if (option === currentQuiz.answer) {
+            score++;
+          }
+          currentQuestion++;
+          if (currentQuestion < quizData.length) {
+            loadQuestion();
+          } else {
+            questionEl.textContent = "Quiz Completed!";
+            optionsEl.innerHTML = "";
+            nextBtn.style.display = "none";
+            scoreEl.textContent = `You scored ${score} out of ${quizData.length}`;
+          }
+        });
+        optionsEl.appendChild(li);
+      });
+    }
+
+    nextBtn.addEventListener("click", loadQuestion);
+
+    loadQuestion();
+
+    // API Data Fetching
+    const jokeEl = document.getElementById("joke");
+    const newJokeBtn = document.getElementById("new-joke");
+
+    async function fetchJoke() {
+      try {
+        const response = await fetch("https://official-joke-api.appspot.com/random_joke");
+        const data = await response.json();
+        jokeEl.textContent = `${data.setup} - ${data.punchline}`;
+      } catch (error) {
+        jokeEl.textContent = "Failed to fetch joke.";
+        console.error("Error fetching joke:", error);
+      }
+    }
+
+    newJokeBtn.addEventListener("click", fetchJoke);
+
+    fetchJoke();
+  </script>
+</body>
+</html>
